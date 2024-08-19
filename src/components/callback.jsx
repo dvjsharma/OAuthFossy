@@ -19,9 +19,18 @@ const OAuthCallbackHandler = () => {
                             state,
                         }
                     );
-                    console.log("Received auth token:", response.data.Authorization);
-                    setMessage(response.data.Authorization);
+                    console.log(response.data.Authorization);
                     window.history.replaceState({}, document.title, "/");
+                    const userData = await axios.get(
+                        "http://localhost/repo/api/v1/users/self",
+                        {
+                            headers: {
+                                Authorization: response.data.Authorization,
+                            },
+                        }
+                    );
+                    console.log(userData);
+                    setMessage(userData.data);
                 } catch (error) {
                     console.error("Error handling OAuth callback:", error);
                 }
@@ -33,7 +42,32 @@ const OAuthCallbackHandler = () => {
         handleCallback();
     }, []);
 
-    return <div>{message}</div>;
+    return (
+        message && (
+            <div>
+                <ul>
+                    <li>
+                        <h3>Name: {message.name}</h3>
+                    </li>
+                </ul>
+                <ul>
+                    <li>
+                        <h3>Email: {message.email}</h3>
+                    </li>
+                </ul>
+                <ul>
+                    <li>
+                        <h3>Id: {message.id}</h3>
+                    </li>
+                </ul>
+                <ul>
+                    <li>
+                        <h3>Access: {message.accessLevel}</h3>
+                    </li>
+                </ul>
+            </div>
+        )
+    );
 };
 
 export default OAuthCallbackHandler;
